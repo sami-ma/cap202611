@@ -83,5 +83,52 @@ ubuntu@ubuntu:~$ ip link
 ubuntu@ubuntu:~$ sudo ip addr add  172.16.220.141/24 dev ens37
 ubuntu@ubuntu:~$
 
+ubuntu@ubuntu:~$ ip route show
+default via 172.16.220.2 dev ens33 proto dhcp src 172.16.220.129 metric 100
+172.16.220.0/24 dev ens33 proto kernel scope link src 172.16.220.129 metric 100
+172.16.220.2 dev ens33 proto dhcp scope link src 172.16.220.129 metric 100
+ubuntu@ubuntu:~$ ip route get 8.8.8.8
+8.8.8.8 via 172.16.220.2 dev ens33 src 172.16.220.129 uid 1000
+    cache
+ubuntu@ubuntu:~$ ip route get amazon.com
+Error: any valid prefix is expected rather than "amazon.com".
+
+ubuntu@ubuntu:~$ ip neigh show
+172.16.220.254 dev ens33 lladdr 00:50:56:f1:d3:86 STALE 
+172.16.220.2 dev ens33 lladdr 00:50:56:f3:27:24 STALE
+172.16.220.1 dev ens33 lladdr 00:50:56:c0:00:08 REACHABLE
+ubuntu@ubuntu:~$
+
+RHEL Networking
+
+[admin@localhost ~]$ rpm -qa|grep route
+iproute-6.17.0-2.el10.x86_64
+iproute-tc-6.17.0-2.el10.x86_64
+
+[admin@localhost ~]$ rpm -qa|grep -i network
+NetworkManager-libnm-1.56.0-1.el10.x86_64
+NetworkManager-1.56.0-1.el10.x86_64
+dracut-network-107-4.el10.x86_64
+NetworkManager-tui-1.56.0-1.el10.x86_64
+NetworkManager-config-server-1.56.0-1.el10.noarch
+
+[admin@localhost ~]$ systemctl status NetworkManager
+
+[root@localhost system-connections]# nmcli device show
+
+Setting IP address using nmcli
+
+ nmcli connection add type ethernet con-name myconmae_ens224 ifname ens224 ipv4.method manual ipv4.addresses 172.16.220.142/24 ipv4.gateway 172.16.220.2 ipv4.dns "8.8.8.8,114.114.114.114" ipv6.method disabled autoconnect yes
+Connection 'myconmae_ens224' (a00b9931-5d02-48bd-892c-a425cdab0cb3) successfully added.
+[root@localhost system-connections]#
+
+[root@localhost system-connections]# nmcli connection reload
+
+
+[admin@localhost ~]$ sudo nmcli connection modify myconmae_ens224  ipv4.addresses 172.16.220.145/24
+[sudo] password for admin:
+
+
+
 
 
