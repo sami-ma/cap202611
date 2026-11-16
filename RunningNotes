@@ -46,4 +46,28 @@ Day 2:
     altname enx000c2915bf36
 [admin@localhost ~]$
 
+ubuntu@ubuntu:~$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:3f:8d:21 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+3: ens37: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:3f:8d:2b brd ff:ff:ff:ff:ff:ff
+    altname enp2s5
+
+ubuntu@ubuntu:~$ sudo ip link set  ens37 mtu 3000
+
+ubuntu@ubuntu:~$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:3f:8d:21 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+3: ens37: <BROADCAST,MULTICAST> mtu 3000 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:3f:8d:2b brd ff:ff:ff:ff:ff:ff
+    altname enp2s5
+ubuntu@ubuntu:~$
+
+
 
