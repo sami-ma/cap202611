@@ -129,6 +129,28 @@ Connection 'myconmae_ens224' (a00b9931-5d02-48bd-892c-a425cdab0cb3) successfully
 [sudo] password for admin:
 
 
+Day 3
+-----
+
+[admin@localhost ~]$ sudo nmcli connection down ens160
+
+ssh  using second adapter to bring the connection up. 
+
+[admin@localhost ~]$ nmcli connection show
+
+NAME             UUID                                  TYPE      DEVICE
+myconmae_ens224  a00b9931-5d02-48bd-892c-a425cdab0cb3  ethernet  ens224
+lo               baab02b8-062b-4e87-8d9a-108246194def  loopback  lo
+ens160           b48c964d-9f23-3fe2-9925-b19142a79a3e  ethernet  --
+[admin@localhost ~]$ sudo nmcli connection up  ens160
+[sudo] password for admin:
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/6)
+[admin@localhost ~]$ nmcli connection show
+NAME             UUID                                  TYPE      DEVICE
+myconmae_ens224  a00b9931-5d02-48bd-892c-a425cdab0cb3  ethernet  ens224
+ens160           b48c964d-9f23-3fe2-9925-b19142a79a3e  ethernet  ens160
+lo               baab02b8-062b-4e87-8d9a-108246194def  loopback  lo
+[admin@localhost ~]$
 
 
 
