@@ -152,5 +152,21 @@ ens160           b48c964d-9f23-3fe2-9925-b19142a79a3e  ethernet  ens160
 lo               baab02b8-062b-4e87-8d9a-108246194def  loopback  lo
 [admin@localhost ~]$
 
+Now bring down the both adapter:
+
+[admin@localhost ~]$ sudo nmcli connection down  ens160
+Connection 'ens160' successfully deactivated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/6)
+[admin@localhost ~]$
+
+[admin@localhost ~]$ sudo nmcli connection down myconmae_ens224
+
+Now both the connections are down
+
+At this point we can restore (bring up the connection) from console
+
+[admin@localhost ~]$ sudo nmcli connection up  ens160
+[admin@localhost ~]$ sudo nmcli connection up  myconmae_ens224
+
+
 
 
