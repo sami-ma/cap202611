@@ -167,6 +167,17 @@ At this point we can restore (bring up the connection) from console
 [admin@localhost ~]$ sudo nmcli connection up  ens160
 [admin@localhost ~]$ sudo nmcli connection up  myconmae_ens224
 
+Change Hostname:
+----------------
+[admin@localhost ~]$ hostname
+localhost.localdomain
 
+[admin@localhost ~]$ sudo nmcli general hostname rocky
+[admin@localhost ~]$ hostname
+rocky
+[admin@localhost ~]$
 
-
+[admin@localhost ~]$ sudo hostnamectl set-hostname rhel
+[admin@localhost ~]$ hostname
+rhel
+[admin@localhost ~]$
