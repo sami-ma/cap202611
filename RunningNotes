@@ -250,5 +250,40 @@ GENERAL.REASON:                         39 (Device disconnected by user >
 ~
 ~
 
+Neywrokign in Ununtu:
+
+ubuntu@ubuntu:/etc$ systemctl status systemd-networkd
+● systemd-networkd.service - Network Configuration
+     Loaded: loaded (/usr/lib/systemd/system/systemd-networkd.serv>
+     Active: active (running) since Tue 2026-11-17 06:56:12 UTC; 1>
+TriggeredBy: ● systemd-networkd.socket
+       Docs: man:systemd-networkd.service(8)
+             man:org.freedesktop.network1(5)
+   Main PID: 30506 (systemd-network)
+     Status: "Processing requests..."
+      Tasks: 1 (limit: 4543)
+   FD Store: 1 (limit: 512)
+     Memory: 1.6M (peak: 2.1M)
+        CPU: 1.549s
+     CGroup: /system.slice/systemd-networkd.service
+             └─30506 /usr/lib/systemd/systemd-networkd
+ubuntu@ubuntu:/etc$
+
+
+ubuntu@ubuntu:/etc$ cd netplan/
+ubuntu@ubuntu:/etc/netplan$ pwd
+/etc/netplan
+ubuntu@ubuntu:/etc/netplan$ ls
+50-cloud-init.yaml
+ubuntu@ubuntu:/etc/netplan$ cat 50-cloud-init.yaml
+cat: 50-cloud-init.yaml: Permission denied
+ubuntu@ubuntu:/etc/netplan$ sudo cat 50-cloud-init.yaml
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: true
+ubuntu@ubuntu:/etc/netplan$
+
 
 
