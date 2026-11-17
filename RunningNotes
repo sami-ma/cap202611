@@ -181,3 +181,74 @@ rocky
 [admin@localhost ~]$ hostname
 rhel
 [admin@localhost ~]$
+
+Diagnosing NIC issues
+--------------------
+
+[admin@localhost ~]$ nmcli -f GENERAL.DEVICE,GENERAL.STATE,GENERAL.REASON device show
+GENERAL.DEVICE:                         ens160
+GENERAL.STATE:                          100 (connected)
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         lo
+GENERAL.STATE:                          100 (connected (externally))
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         ens224
+GENERAL.STATE:                          30 (disconnected)
+GENERAL.REASON:                         39 (Device disconnected by user >
+lines 1-11/11 (END)...skipping...
+GENERAL.DEVICE:                         ens160
+GENERAL.STATE:                          100 (connected)
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         lo
+GENERAL.STATE:                          100 (connected (externally))
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         ens224
+GENERAL.STATE:                          30 (disconnected)
+GENERAL.REASON:                         39 (Device disconnected by user >
+~
+~
+~
+~
+~
+~
+~
+ ESCOC
+    ens160
+    100 (connected)
+    0 (No reason given)
+
+    lo
+    100 (connected (externally))
+    0 (No reason given)
+
+    ens224
+    30 (disconnected)
+    39 (Device disconnected by user or client)
+~
+~
+~
+~
+~
+~
+~
+ ESCOD
+GENERAL.DEVICE:                         ens160
+GENERAL.STATE:                          100 (connected)
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         lo
+GENERAL.STATE:                          100 (connected (externally))
+GENERAL.REASON:                         0 (No reason given)
+
+GENERAL.DEVICE:                         ens224
+GENERAL.STATE:                          30 (disconnected)
+GENERAL.REASON:                         39 (Device disconnected by user >
+~
+~
+
+
+
