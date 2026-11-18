@@ -344,6 +344,219 @@ ubuntu@ubuntu:/etc/netplan$ ip a
 ubuntu@ubuntu:/etc/netplan$
 
 
+Day 4 : Firewalls
+
+[root@rhel ~]# systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+     Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled;>
+     Active: active (running) since Tue 2026-11-17 02:53:00 IST; 1 day 2>
+ Invocation: 532a1f9b920b49b8a3dfcd05cd11e8da
+       Docs: man:firewalld(1)
+   Main PID: 1043 (firewalld)
+      Tasks: 2 (limit: 10317)
+     Memory: 46.5M (peak: 47M)
+        CPU: 4.727s
+     CGroup: /system.slice/firewalld.service
+             └─1043 /usr/bin/python3 -sP /usr/sbin/firewalld --nofork -->
+
+Nov 17 02:52:52 localhost systemd[1]: Starting firewalld.service - firew>
+Nov 17 02:53:00 localhost systemd[1]: Started firewalld.service - firewa>
+
+[root@rhel ~]# systemctl stop firewalld
+[root@rhel ~]# 
+
+[root@rhel ~]# systemctl start firewalld
+[root@rhel ~]#
+
+[root@rhel ~]# systemctl start firewalld
+
+[root@rhel ~]# systemctl is-active firewalld
+active
+
+[root@rhel ~]# firewall-cmd --state
+running
+[root@rhel ~]#
+
+[root@rhel ~]# systemctl disable firewalld
+Removed '/etc/systemd/system/multi-user.target.wants/firewalld.service'.
+Removed '/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service'.
+
+[root@rhel ~]#
+[root@rhel ~]#  systemctl is-active firewalld
+active
+[root@rhel ~]# firewall-cmd --state
+running
+[root@rhel ~]#  systemctl is-active firewalld
+active
+[root@rhel ~]#  systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+     Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled>
+     Active: active (running) since Thu 2026-11-19 00:41:52 IST; 4min 25>
+ Invocation: 27d9d78eb05f4a6a854f90e72ffb5a43
+       Docs: man:firewalld(1)
+   Main PID: 9637 (firewalld)
+      Tasks: 2 (limit: 10317)
+     Memory: 26M (peak: 27.8M)
+        CPU: 2.919s
+     CGroup: /system.slice/firewalld.service
+             └─9637 /usr/bin/python3 -sP /usr/sbin/firewalld --nofork -->
+
+Nov 19 00:41:50 rhel systemd[1]: Starting firewalld.service - firewalld >
+Nov 19 00:41:52 rhel systemd[1]: Started firewalld.service - firewalld ->
+[root@rhel ~]#
+
+[root@rhel ~]#  systemctl enable firewalld
+Created symlink '/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service' → '/usr/lib/systemd/system/firewalld.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/firewalld.service' → '/usr/lib/systemd/system/firewalld.service'.
+[root@rhel ~]#
+
+[root@rhel ~]# firewall-cmd --get-zones
+block dmz drop external home internal nm-shared public trusted work
+[root@rhel ~]#
+
+[root@rhel ~]# firewall-cmd --get-zones
+block dmz drop external home internal nm-shared public trusted work
+
+[root@rhel ~]# firewall-cmd --get-default-zone
+public
+
+[root@rhel ~]# firewall-cmd --get-active-zones
+public (default)
+  interfaces: ens160 ens224
+
+[root@rhel ~]# firewall-cmd --list-all
+public (default, active)
+  target: default
+  ingress-priority: 0
+  egress-priority: 0
+  icmp-block-inversion: no
+  interfaces: ens160 ens224
+  sources:
+  services: cockpit dhcpv6-client ssh
+  ports:
+  protocols:
+  forward: yes
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+[root@rhel ~]#
+
+[root@rhel ~]# firewall-cmd --info-service=ssh
+ssh
+  ports: 22/tcp
+  protocols:
+  source-ports:
+  modules:
+  destination:
+  includes:
+  helpers:
+
+[root@rhel ~]# firewall-cmd --list-all
+public (default, active)
+  target: default
+  ingress-priority: 0
+  egress-priority: 0
+  icmp-block-inversion: no
+  interfaces: ens160 ens224
+  sources:
+  services: cockpit dhcpv6-client ssh
+  ports:
+  protocols:
+  forward: yes
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+
+[root@rhel ~]# firewall-cmd --info-service=cockpit
+cockpit
+  ports: 9090/tcp
+  protocols:
+  source-ports:
+  modules:
+  destination:
+  includes:
+  helpers:
+[root@rhel ~]#
+
+
+[root@rhel ~]# cd /etc/firewalld/
+
+[root@rhel firewalld]# ls
+firewalld.conf  helpers  icmptypes  ipsets  policies  services  zones
+[root@rhel firewalld]# cd services/
+[root@rhel services]# ls
+[root@rhel services]# cd ..
+[root@rhel firewalld]# cd zones/
+[root@rhel zones]# ls
+public.xml  public.xml.old
+[root@rhel zones]#
+
+[root@rhel zones]# cat public.xml
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>Public</short>
+  <description>For use in public areas. You do not trust the other comput     ers on networks to not harm your computer. Only selected incoming connect     ions are accepted.</description>
+  <service name="ssh"/>
+  <service name="dhcpv6-client"/>
+  <service name="cockpit"/>
+  <forward/>
+</zone>
+[root@rhel zones]#
+
+
+[root@rhel ~]# firewall-cmd --permanent --new-zone=webonly
+success
+[root@rhel ~]# firewall-cmd --reload
+success
+[root@rhel ~]# ls /etc/firewalld/
+firewalld.conf  helpers  icmptypes  ipsets  policies  services  zones
+[root@rhel ~]# ls /etc/firewalld/zones/
+public.xml  public.xml.old  webonly.xml
+[root@rhel ~]# cat  /etc/firewalld/zones/webonly.xml
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+</zone>
+[root@rhel ~]# firewall-cmd --zone=webonly --add-service=http --add-service=https
+success
+[root@rhel ~]# firewall-cmd --zone=webonly --add-service=http --add-service=https --permanent
+success
+[root@rhel ~]# cat  /etc/firewalld/zones/webonly.xml                          <?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <service name="http"/>
+  <service name="https"/>
+</zone>
+[root@rhel ~]#
+
+[root@rhel ~]# firewall-cmd --info-zone=webonly
+webonly
+  target: default
+  ingress-priority: 0
+  egress-priority: 0
+  icmp-block-inversion: no
+  interfaces:
+  sources:
+  services: http https
+  ports:
+  protocols:
+  forward: no
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+
+[root@rhel ~]# firewall-cmd --permanent --zone=webonly --set-target=DROP
+success
+[root@rhel ~]# firewall-cmd --reload
+success
+[root@rhel ~]#
+
+
+
 
 
 
