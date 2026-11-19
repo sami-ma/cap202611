@@ -668,6 +668,46 @@ Logging enabled
 root@ubuntu:~#
 
 
+Network Troubleshooting:
+-------------------------
+
+root@ubuntu:~# ip -br link
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+ens33            UP             00:0c:29:3f:8d:21 <BROADCAST,MULTICAST,UP,LOWER_UP>
+ens37            UP             00:0c:29:3f:8d:2b <BROADCAST,MULTICAST,UP,LOWER_UP>
+root@ubuntu:~#
+
+root@ubuntu:~# ping -c 4 172.16.220.128
+PING 172.16.220.128 (172.16.220.128) 56(84) bytes of data.
+64 bytes from 172.16.220.128: icmp_seq=1 ttl=64 time=1.37 ms
+64 bytes from 172.16.220.128: icmp_seq=2 ttl=64 time=1.24 ms
+64 bytes from 172.16.220.128: icmp_seq=3 ttl=64 time=1.22 ms
+64 bytes from 172.16.220.128: icmp_seq=4 ttl=64 time=1.78 ms
+
+--- 172.16.220.128 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3006ms
+rtt min/avg/max/mdev = 1.221/1.403/1.777/0.223 ms
+root@ubuntu:~# ping -c 4 -s 1600 -M do 172.16.220.128
+PING 172.16.220.128 (172.16.220.128) 1600(1628) bytes of data.
+ping: local error: message too long, mtu=1500
+ping: local error: message too long, mtu=1500
+ping: local error: message too long, mtu=1500
+ping: local error: message too long, mtu=1500
+
+--- 172.16.220.128 ping statistics ---
+4 packets transmitted, 0 received, +4 errors, 100% packet loss, time 3075ms
+
+root@ubuntu:~# ping -c 4 -s 1600  172.16.220.128
+PING 172.16.220.128 (172.16.220.128) 1600(1628) bytes of data.
+1608 bytes from 172.16.220.128: icmp_seq=1 ttl=64 time=3.07 ms
+1608 bytes from 172.16.220.128: icmp_seq=2 ttl=64 time=1.72 ms
+1608 bytes from 172.16.220.128: icmp_seq=3 ttl=64 time=1.51 ms
+1608 bytes from 172.16.220.128: icmp_seq=4 ttl=64 time=2.30 ms
+
+--- 172.16.220.128 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 1.512/2.152/3.073/0.605 ms
+root@ubuntu:~#
 
 
 
