@@ -556,6 +556,119 @@ success
 [root@rhel ~]#
 
 
+Day - 5
+Ubuntu Firewall
+
+ubuntu@ubuntu:~$ ufw status
+ERROR: You need to be root to run this script
+ubuntu@ubuntu:~$ sudo ufw status
+[sudo] password for ubuntu:
+Status: inactive
+ubuntu@ubuntu:~$ iptables -V
+iptables v1.8.10 (nf_tables)
+ubuntu@ubuntu:~$
+
+
+
+ubuntu@ubuntu:~$ sudo ufw version
+ufw 0.36.2
+Copyright 2008-2023 Canonical Ltd.
+ubuntu@ubuntu:~$
+
+ubuntu@ubuntu:~$ sudo ufw allow 22/tcp
+root@ubuntu:~# sudo ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere                 
+22/tcp (v6)                ALLOW IN    Anywhere (v6)            
+
+root@ubuntu:~#
+
+root@ubuntu:~# sudo ufw show added
+Added user rules (see 'ufw status' for running firewall):
+ufw allow 22/tcp
+
+root@ubuntu:~# sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere            
+[ 2] 22/tcp (v6)                ALLOW IN    Anywhere (v6)       
+
+root@ubuntu:~# sudo ufw allow 3306/tcp
+Rule added
+Rule added (v6)
+root@ubuntu:~# sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere            
+[ 2] 3306/tcp                   ALLOW IN    Anywhere            
+[ 3] 22/tcp (v6)                ALLOW IN    Anywhere (v6)       
+[ 4] 3306/tcp (v6)              ALLOW IN    Anywhere (v6)       
+
+root@ubuntu:~# sudo ufw deny 3306/tcp
+Rule updated
+Rule updated (v6)
+root@ubuntu:~# sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere            
+[ 2] 3306/tcp                   DENY IN     Anywhere            
+[ 3] 22/tcp (v6)                ALLOW IN    Anywhere (v6)       
+[ 4] 3306/tcp (v6)              DENY IN     Anywhere (v6)       
+
+root@ubuntu:~#
+
+root@ubuntu:~# sudo ufw app list
+Available applications:
+  OpenSSH
+root@ubuntu:~#
+root@ubuntu:~# sudo ufw app list
+Available applications:
+  OpenSSH
+root@ubuntu:~# sudo ufw app info OpenSSH
+Profile: OpenSSH
+Title: Secure shell server, an rshd replacement
+Description: OpenSSH is a free implementation of the Secure Shell protocol.
+
+Port:
+  22/tcp
+root@ubuntu:~#
+
+
+root@ubuntu:~# sudo ufw status verbose | head -2
+Status: active
+Logging: on (low)
+root@ubuntu:~# sudo ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere                 
+3306/tcp                   DENY IN     Anywhere                 
+22/tcp (v6)                ALLOW IN    Anywhere (v6)            
+3306/tcp (v6)              DENY IN     Anywhere (v6)            
+
+
+root@ubuntu:~# sudo ufw logging on
+Logging enabled
+root@ubuntu:~#
+
+
+
 
 
 
