@@ -710,7 +710,433 @@ rtt min/avg/max/mdev = 1.512/2.152/3.073/0.605 ms
 root@ubuntu:~#
 
 
+Day 6:
+
+DNS Servers (BIND package instalation)
+
+[admin@rhel ~]$ sudo dnf install -y bind
+[sudo] password for admin:
+Last metadata expiration check: 0:29:11 ago on Sat 21 Nov 2026 12:10:36 AM IST.
+Dependencies resolved.
+================================================================================
+ Package              Arch      Version                      Repository    Size
+================================================================================
+Installing:
+ bind                 x86_64    32:9.18.33-30.el10_3.1       appstream    324 k
+Upgrading:
+ bind-libs            x86_64    32:9.18.33-30.el10_3.1       appstream    1.3 M
+ bind-license         noarch    32:9.18.33-30.el10_3.1       appstream     15 k
+ bind-utils           x86_64    32:9.18.33-30.el10_3.1       appstream    221 k
+Installing weak dependencies:
+ bind-dnssec-utils    x86_64    32:9.18.33-30.el10_3.1       appstream    148 k
+
+Transaction Summary
+================================================================================
+Install  2 Packages
+Upgrade  3 Packages
+
+Total download size: 2.0 M
+Downloading Packages:
+(1/5): bind-9.18.33-30.el10_3.1.x86_64.rpm      921 kB/s | 324 kB     00:00
+(2/5): bind-dnssec-utils-9.18.33-30.el10_3.1.x8 397 kB/s | 148 kB     00:00
+(3/5): bind-license-9.18.33-30.el10_3.1.noarch. 436 kB/s |  15 kB     00:00
+(4/5): bind-utils-9.18.33-30.el10_3.1.x86_64.rp 1.8 MB/s | 221 kB     00:00
+(5/5): bind-libs-9.18.33-30.el10_3.1.x86_64.rpm 2.4 MB/s | 1.3 MB     00:00
+--------------------------------------------------------------------------------
+Total                                           1.1 MB/s | 2.0 MB     00:01
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Upgrading        : bind-license-32:9.18.33-30.el10_3.1.noarch             1/8
+  Upgrading        : bind-libs-32:9.18.33-30.el10_3.1.x86_64                2/8
+  Upgrading        : bind-utils-32:9.18.33-30.el10_3.1.x86_64               3/8
+  Installing       : bind-dnssec-utils-32:9.18.33-30.el10_3.1.x86_64        4/8
+  Running scriptlet: bind-32:9.18.33-30.el10_3.1.x86_64                     5/8
+  Installing       : bind-32:9.18.33-30.el10_3.1.x86_64                     5/8
+  Running scriptlet: bind-32:9.18.33-30.el10_3.1.x86_64                     5/8
+  Cleanup          : bind-utils-32:9.18.33-15.el10_2.1.x86_64               6/8
+  Cleanup          : bind-libs-32:9.18.33-15.el10_2.1.x86_64                7/8
+  Cleanup          : bind-license-32:9.18.33-15.el10_2.1.noarch             8/8
+  Running scriptlet: bind-license-32:9.18.33-15.el10_2.1.noarch             8/8
+
+Upgraded:
+  bind-libs-32:9.18.33-30.el10_3.1.x86_64
+  bind-license-32:9.18.33-30.el10_3.1.noarch
+  bind-utils-32:9.18.33-30.el10_3.1.x86_64
+Installed:
+  bind-32:9.18.33-30.el10_3.1.x86_64
+  bind-dnssec-utils-32:9.18.33-30.el10_3.1.x86_64
+
+Complete!
+[admin@rhel ~]$
+
+[admin@rhel ~]$ sudo systemctl enable --now named
+Created symlink '/etc/systemd/system/multi-user.target.wants/named.service' → '/usr/lib/systemd/system/named.service'.
+[admin@rhel ~]$
 
 
+[admin@rhel ~]$ sudo named-checkconf
 
+[admin@rhel ~]$ sudo firewall-cmd --permanent --add-service=dns
+success
+
+[admin@rhel ~]$ sudo firewall-cmd --reload
+success
+[admin@rhel ~]$
+
+configuration:
+
+[admin@rhel ~]$ sudo cat /etc/named.conf
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+acl mynet { 127.0.0.1; 172.16.220.0/24; };
+options {
+        listen-on port 53 { 127.0.0.1; 172.16.220.128; 172.16.220.145; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        forwarders { 1.1.1.1; 8.8.8.8; }; 
+        secroots-file   "/var/named/data/named.secroots";
+        recursing-file  "/var/named/data/named.recursing";
+        allow-query     { localhost; mynet; };
+
+
+[admin@rhel ~]$ sudo named-checkconf
+[admin@rhel ~]$ sudo systemctl restart named
+[admin@rhel ~]$
+NTP Client (Chrony)
+-------------------
+
+[admin@rhel ~]$ sudo vi /etc/chrony.conf
+[sudo] password for admin:
+[admin@rhel ~]$ systemctl restart chrony
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ====
+Authentication is required to restart 'chrony.service'.
+Authenticating as: admin
+Password:
+==== AUTHENTICATION COMPLETE ====
+Failed to restart chrony.service: Unit chrony.service not found.
+[admin@rhel ~]$ cat /etc/chrony.conf |grep windows
+time.windows.com iburst
+[admin@rhel ~]$
+
+
+HTTP Server (Apache Web Server)
+-------------------------------
+
+[admin@rhel ~]$ sudo dnf install -y httpd
+Last metadata expiration check: 1:10:23 ago on Sat 21 Nov 2026 12:10:36 AM IST.
+Dependencies resolved.
+================================================================================
+ Package               Arch       Version                   Repository     Size
+================================================================================
+Installing:
+ httpd                 x86_64     2.4.63-13.el10_2.8        appstream      49 k
+Installing dependencies:
+ apr                   x86_64     1.7.5-3.el10              appstream     127 k
+ apr-util              x86_64     1.6.3-23.el10_2.1         appstream      98 k
+ apr-util-lmdb         x86_64     1.6.3-23.el10_2.1         appstream      13 k
+ httpd-core            x86_64     2.4.63-13.el10_2.8        appstream     1.4 M
+ httpd-filesystem      noarch     2.4.63-13.el10_2.8        appstream      15 k
+ httpd-tools           x86_64     2.4.63-13.el10_2.8        appstream      82 k
+ rocky-logos-httpd     noarch     100.5-3.el10              appstream      24 k
+Installing weak dependencies:
+ apr-util-openssl      x86_64     1.6.3-23.el10_2.1         appstream      15 k
+ mod_http2             x86_64     2.0.29-5.el10_3.1         appstream     165 k
+ mod_lua               x86_64     2.4.63-13.el10_2.8        appstream      61 k
+
+Transaction Summary
+================================================================================
+Install  11 Packages
+
+Total download size: 2.0 M
+Installed size: 6.0 M
+Downloading Packages:
+(1/11): apr-util-lmdb-1.6.3-23.el10_2.1.x86_64.  26 kB/s |  13 kB     00:00
+(2/11): apr-util-1.6.3-23.el10_2.1.x86_64.rpm   175 kB/s |  98 kB     00:00
+(3/11): apr-1.7.5-3.el10.x86_64.rpm             223 kB/s | 127 kB     00:00
+(4/11): httpd-2.4.63-13.el10_2.8.x86_64.rpm     403 kB/s |  49 kB     00:00
+(5/11): apr-util-openssl-1.6.3-23.el10_2.1.x86_  69 kB/s |  15 kB     00:00
+(6/11): httpd-core-2.4.63-13.el10_2.8.x86_64.rp 4.0 MB/s | 1.4 MB     00:00
+(7/11): httpd-filesystem-2.4.63-13.el10_2.8.noa  68 kB/s |  15 kB     00:00
+(8/11): httpd-tools-2.4.63-13.el10_2.8.x86_64.r 418 kB/s |  82 kB     00:00
+(9/11): rocky-logos-httpd-100.5-3.el10.noarch.r 261 kB/s |  24 kB     00:00
+(10/11): mod_lua-2.4.63-13.el10_2.8.x86_64.rpm  559 kB/s |  61 kB     00:00
+(11/11): mod_http2-2.0.29-5.el10_3.1.x86_64.rpm 886 kB/s | 165 kB     00:00
+--------------------------------------------------------------------------------
+Total                                           842 kB/s | 2.0 MB     00:02
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Installing       : apr-1.7.5-3.el10.x86_64                               1/11
+  Installing       : apr-util-lmdb-1.6.3-23.el10_2.1.x86_64                2/11
+  Installing       : apr-util-openssl-1.6.3-23.el10_2.1.x86_64             3/11
+  Installing       : apr-util-1.6.3-23.el10_2.1.x86_64                     4/11
+  Installing       : httpd-tools-2.4.63-13.el10_2.8.x86_64                 5/11
+  Installing       : rocky-logos-httpd-100.5-3.el10.noarch                 6/11
+  Running scriptlet: httpd-filesystem-2.4.63-13.el10_2.8.noarch            7/11
+  Installing       : httpd-filesystem-2.4.63-13.el10_2.8.noarch            7/11
+  Installing       : httpd-core-2.4.63-13.el10_2.8.x86_64                  8/11
+  Installing       : mod_http2-2.0.29-5.el10_3.1.x86_64                    9/11
+  Installing       : mod_lua-2.4.63-13.el10_2.8.x86_64                    10/11
+  Installing       : httpd-2.4.63-13.el10_2.8.x86_64                      11/11
+  Running scriptlet: httpd-2.4.63-13.el10_2.8.x86_64                      11/11
+
+Installed:
+  apr-1.7.5-3.el10.x86_64
+  apr-util-1.6.3-23.el10_2.1.x86_64
+  apr-util-lmdb-1.6.3-23.el10_2.1.x86_64
+  apr-util-openssl-1.6.3-23.el10_2.1.x86_64
+  httpd-2.4.63-13.el10_2.8.x86_64
+  httpd-core-2.4.63-13.el10_2.8.x86_64
+  httpd-filesystem-2.4.63-13.el10_2.8.noarch
+  httpd-tools-2.4.63-13.el10_2.8.x86_64
+  mod_http2-2.0.29-5.el10_3.1.x86_64
+  mod_lua-2.4.63-13.el10_2.8.x86_64
+  rocky-logos-httpd-100.5-3.el10.noarch
+
+Complete!
+[admin@rhel ~]$
+
+[admin@rhel ~]$ sudo systemctl enable --now httpd
+
+[admin@rhel ~]$ curl localhost
+
+
+Samba File Sharing (From Linux to Windows)
+------------------------------------------
+[admin@rhel conf]$ sudo dnf install -y samba samba-client cifs-utils
+[sudo] password for admin:
+Last metadata expiration check: 1:48:51 ago on Sat 21 Nov 2026 12:10:36 AM IST.
+Dependencies resolved.
+================================================================================
+ Package                   Arch      Version                 Repository    Size
+================================================================================
+Installing:
+ cifs-utils                x86_64    7.7-1.el10_2            baseos       114 k
+ samba                     x86_64    4.24.5-101.el10         baseos       844 k
+ samba-client              x86_64    4.24.5-101.el10         appstream    736 k
+Upgrading:
+ libldb                    x86_64    4.24.5-101.el10         baseos       181 k
+ libsmbclient              x86_64    4.24.5-101.el10         baseos        76 k
+ libtalloc                 x86_64    2.4.4-100.el10          baseos        33 k
+ libtdb                    x86_64    1.4.15-100.el10         baseos        54 k
+ libwbclient               x86_64    4.24.5-101.el10         baseos        44 k
+ samba-client-libs         x86_64    4.24.5-101.el10         baseos       3.1 M
+ samba-common              noarch    4.24.5-101.el10         baseos       181 k
+Installing dependencies:
+ cups-filesystem           noarch    1:2.4.10-18.el10_2      baseos        11 k
+ cups-libs                 x86_64    1:2.4.10-18.el10_2      baseos       260 k
+ libnetapi                 x86_64    4.24.5-101.el10         baseos       145 k
+ samba-common-tools        x86_64    4.24.5-101.el10         baseos       516 k
+ samba-core-libs           x86_64    4.24.5-101.el10         baseos       471 k
+ samba-dcerpc              x86_64    4.24.5-101.el10         baseos       722 k
+ samba-ldb-ldap-modules    x86_64    4.24.5-101.el10         baseos        36 k
+ samba-libs                x86_64    4.24.5-101.el10         baseos       1.1 M
+ samba-ndr-libs            x86_64    4.24.5-101.el10         baseos       1.1 M
+     replacing  samba-common-libs.x86_64 4.23.5-107.el10_2
+
+Transaction Summary
+================================================================================
+Install  12 Packages
+Upgrade   7 Packages
+
+Total download size: 9.6 M
+Downloading Packages:
+(1/19): cups-filesystem-2.4.10-18.el10_2.noarch  45 kB/s |  11 kB     00:00
+(2/19): cups-libs-2.4.10-18.el10_2.x86_64.rpm   894 kB/s | 260 kB     00:00
+(3/19): cifs-utils-7.7-1.el10_2.x86_64.rpm      364 kB/s | 114 kB     00:00
+(4/19): libnetapi-4.24.5-101.el10.x86_64.rpm    1.6 MB/s | 145 kB     00:00
+(5/19): samba-4.24.5-101.el10.x86_64.rpm        3.9 MB/s | 844 kB     00:00
+(6/19): samba-common-tools-4.24.5-101.el10.x86_ 2.3 MB/s | 516 kB     00:00
+(7/19): samba-core-libs-4.24.5-101.el10.x86_64. 2.0 MB/s | 471 kB     00:00
+(8/19): samba-ldb-ldap-modules-4.24.5-101.el10. 776 kB/s |  36 kB     00:00
+(9/19): samba-dcerpc-4.24.5-101.el10.x86_64.rpm 5.5 MB/s | 722 kB     00:00
+(10/19): samba-libs-4.24.5-101.el10.x86_64.rpm  5.7 MB/s | 1.1 MB     00:00
+(11/19): samba-ndr-libs-4.24.5-101.el10.x86_64. 4.3 MB/s | 1.1 MB     00:00
+(12/19): libldb-4.24.5-101.el10.x86_64.rpm      1.6 MB/s | 181 kB     00:00
+(13/19): libtalloc-2.4.4-100.el10.x86_64.rpm    786 kB/s |  33 kB     00:00
+(14/19): libsmbclient-4.24.5-101.el10.x86_64.rp 1.1 MB/s |  76 kB     00:00
+(15/19): libtdb-1.4.15-100.el10.x86_64.rpm      1.4 MB/s |  54 kB     00:00
+(16/19): libwbclient-4.24.5-101.el10.x86_64.rpm 896 kB/s |  44 kB     00:00
+(17/19): samba-common-4.24.5-101.el10.noarch.rp 616 kB/s | 181 kB     00:00
+(18/19): samba-client-libs-4.24.5-101.el10.x86_ 7.6 MB/s | 3.1 MB     00:00
+(19/19): samba-client-4.24.5-101.el10.x86_64.rp 705 kB/s | 736 kB     00:01
+--------------------------------------------------------------------------------
+Total                                           2.5 MB/s | 9.6 MB     00:03
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Upgrading        : libtalloc-2.4.4-100.el10.x86_64                       1/27
+  Running scriptlet: libwbclient-4.24.5-101.el10.x86_64                    2/27
+  Upgrading        : libwbclient-4.24.5-101.el10.x86_64                    2/27
+  Running scriptlet: samba-common-4.24.5-101.el10.noarch                   3/27
+  Upgrading        : samba-common-4.24.5-101.el10.noarch                   3/27
+  Running scriptlet: samba-common-4.24.5-101.el10.noarch                   3/27
+  Installing       : samba-core-libs-4.24.5-101.el10.x86_64                4/27
+  Upgrading        : libtdb-1.4.15-100.el10.x86_64                         5/27
+  Installing       : samba-ndr-libs-4.24.5-101.el10.x86_64                 6/27
+  Upgrading        : libldb-4.24.5-101.el10.x86_64                         7/27
+  Upgrading        : samba-client-libs-4.24.5-101.el10.x86_64              8/27
+  Installing       : libnetapi-4.24.5-101.el10.x86_64                      9/27
+  Installing       : samba-libs-4.24.5-101.el10.x86_64                    10/27
+  Installing       : samba-ldb-ldap-modules-4.24.5-101.el10.x86_64        11/27
+  Installing       : samba-common-tools-4.24.5-101.el10.x86_64            12/27
+  Upgrading        : libsmbclient-4.24.5-101.el10.x86_64                  13/27
+  Installing       : cups-filesystem-1:2.4.10-18.el10_2.noarch            14/27
+  Installing       : cups-libs-1:2.4.10-18.el10_2.x86_64                  15/27
+  Installing       : samba-dcerpc-4.24.5-101.el10.x86_64                  16/27
+  Installing       : samba-4.24.5-101.el10.x86_64                         17/27
+  Running scriptlet: samba-4.24.5-101.el10.x86_64                         17/27
+  Installing       : samba-client-4.24.5-101.el10.x86_64                  18/27
+  Running scriptlet: samba-client-4.24.5-101.el10.x86_64                  18/27
+  Installing       : cifs-utils-7.7-1.el10_2.x86_64                       19/27
+  Running scriptlet: cifs-utils-7.7-1.el10_2.x86_64                       19/27
+  Cleanup          : libsmbclient-4.23.5-107.el10_2.x86_64                20/27
+  Cleanup          : libwbclient-4.23.5-107.el10_2.x86_64                 21/27
+  Cleanup          : samba-client-libs-4.23.5-107.el10_2.x86_64           22/27
+  Obsoleting       : samba-common-libs-4.23.5-107.el10_2.x86_64           23/27
+  Cleanup          : samba-common-4.23.5-107.el10_2.noarch                24/27
+  Cleanup          : libldb-4.23.5-107.el10_2.x86_64                      25/27
+  Cleanup          : libtalloc-2.4.3-100.el10.x86_64                      26/27
+  Cleanup          : libtdb-1.4.14-100.el10.x86_64                        27/27
+  Running scriptlet: libtdb-1.4.14-100.el10.x86_64                        27/27
+
+Upgraded:
+  libldb-4.24.5-101.el10.x86_64        libsmbclient-4.24.5-101.el10.x86_64
+  libtalloc-2.4.4-100.el10.x86_64      libtdb-1.4.15-100.el10.x86_64
+  libwbclient-4.24.5-101.el10.x86_64   samba-client-libs-4.24.5-101.el10.x86_64
+  samba-common-4.24.5-101.el10.noarch
+Installed:
+  cifs-utils-7.7-1.el10_2.x86_64
+  cups-filesystem-1:2.4.10-18.el10_2.noarch
+  cups-libs-1:2.4.10-18.el10_2.x86_64
+  libnetapi-4.24.5-101.el10.x86_64
+  samba-4.24.5-101.el10.x86_64
+  samba-client-4.24.5-101.el10.x86_64
+  samba-common-tools-4.24.5-101.el10.x86_64
+  samba-core-libs-4.24.5-101.el10.x86_64
+  samba-dcerpc-4.24.5-101.el10.x86_64
+  samba-ldb-ldap-modules-4.24.5-101.el10.x86_64
+  samba-libs-4.24.5-101.el10.x86_64
+  samba-ndr-libs-4.24.5-101.el10.x86_64
+
+Complete!
+[admin@rhel conf]$
+
+Create a user and group for samba :
+
+[admin@rhel ~]$ sudo groupadd smbteam
+[admin@rhel ~]$ sudo useradd -M -s /sbin/nologin alice
+[admin@rhel ~]$ sudo passwd alice
+New password:
+Retype new password:
+Sorry, passwords do not match.
+passwd: Authentication token manipulation error
+passwd: password unchanged
+[admin@rhel ~]$
+[admin@rhel ~]$ sudo usermod -aG smbteam alice
+[admin@rhel ~]$ sudo smbpasswd -a alice
+New SMB password:
+Retype new SMB password:
+Added user alice.
+[admin@rhel ~]$ sudo smbpasswd -e alice
+Enabled user alice.
+[admin@rhel ~]$ sudo pdbedit -L
+alice:1001:
+[admin@rhel ~]$
+
+[admin@rhel ~]$ sudo mkdir -p /srv/samba/team
+[admin@rhel ~]$ sudo chgrp smbteam /srv/samba/team
+[admin@rhel ~]$ sudo chmod 2770 /srv/samba/team
+
+[admin@rhel ~]$ ls -ld /srv/samba/
+drwxr-xr-x. 3 root root 18 Nov 21 02:05 /srv/samba/
+[admin@rhel ~]$ ls -l /srv/samba/
+total 0
+drwxrws---. 2 root smbteam 6 Nov 21 02:05 team
+[admin@rhel ~]$ 
+
+[admin@rhel ~]$ testparm
+Load smb config files from /etc/samba/smb.conf
+Loaded services file OK.
+Weak crypto is allowed by GnuTLS (e.g. NTLM as a compatibility fallback)
+
+Server role: ROLE_STANDALONE
+
+Press enter to see a dump of your service definitions
+
+# Global parameters
+[global]
+        log file = /var/log/samba/log.%m
+        max log size = 1000
+        security = USER
+        server string = Lab File Server
+        idmap config * : backend = tdb
+
+
+[team]
+        create mask = 0660
+        directory mask = 0770
+        force group = smbteam
+        path = /srv/samba/team
+        read only = No
+        valid users = @smbteam
+        write list = @smbteam
+[admin@rhel ~]$ sudo semanage fcontext -a -t samba_share_t "/srv/samba/team(/.*)?"
+[sudo] password for admin:
+[admin@rhel ~]$ sudo restorecon -Rv /srv/samba/team
+Relabeled /srv/samba/team from unconfined_u:object_r:var_t:s0 to unconfined_u:object_r:samba_share_t:s0
+[admin@rhel ~]$ sudo firewall-cmd --permanent --add-service=samba
+success
+[admin@rhel ~]$ sudo firewall-cmd --reload
+success
+[admin@rhel ~]$ sudo systemctl enable --now smb
+
+
+Check from Windows File explorer whether the sahre is accessible
+
+FTP Service
+----------
+
+sudo dnf install -y vsftpd
+
+[root@rhel team]# sudo vi /etc/vsftpd/vsftpd
+vsftpd.conf             vsftpd_conf_migrate.sh
+[root@rhel team]# sudo vi /etc/vsftpd/vsftpd
+vsftpd.conf             vsftpd_conf_migrate.sh
+[root@rhel team]# sudo vi /etc/vsftpd/vsftpd.conf
+[root@rhel team]# sudo useradd -m ftpuser1
+[root@rhel team]# sudo chmod a-w /home/ftpuser1
+[root@rhel team]# sudo mkdir /home/ftpuser1/upload
+[root@rhel team]# sudo chown ftpuser1:ftpuser1 /home/ftpuser1/upload
+[root@rhel team]# sudo setsebool -P ftpd_full_access on
+[root@rhel team]# sudo firewall-cmd --permanent --add-service=ftp
+success
+[root@rhel team]# sudo firewall-cmd --reload
+success
+[root@rhel team]# sudo systemctl enable --now vsftpd
+Created symlink '/etc/systemd/system/multi-user.target.wants/vsftpd.service' → '/usr/lib/systemd/system/vsftpd.service'.
+[root@rhel team]# passwd ftpuser1
+New password:
+BAD PASSWORD: The password fails the dictionary check - it is based on a dictionary word
+Retype new password:
+passwd: password updated successfully
 
